@@ -1,48 +1,23 @@
-use maildir::*;
-
-use std::fs;
-use std::os::unix::ffi::OsStrExt;
+use maildir::Maildir;
+use maildir_testdata::with_testdata;
 
 use mailparse::MailHeaderMap;
-use percent_encoding::percent_decode;
-use tempfile::tempdir;
-use walkdir::WalkDir;
 
-static TESTDATA_DIR: &str = "testdata";
-
-// `cargo package` doesn't package files with certain characters, such as
-// colons, in the name, so we percent-decode the file names when copying the
-// data for the tests.
 fn with_maildir<F>(name: &str, func: F)
 where
     F: FnOnce(Maildir),
 {
-    let tmp_dir = tempdir().expect("could not create temporary directory");
-    let tmp_path = tmp_dir.path();
-    for entry in WalkDir::new(TESTDATA_DIR) {
-        let entry = entry.expect("directory walk error");
-        let relative = entry.path().strip_prefix(TESTDATA_DIR).unwrap();
-        if relative.parent().is_none() {
-            continue;
-        }
-        let decoded = percent_decode(relative.as_os_str().as_bytes())
-            .decode_utf8()
-            .unwrap();
-        if entry.path().is_dir() {
-            fs::create_dir(tmp_path.join(decoded.as_ref())).expect("could not create directory");
-        } else {
-            fs::copy(entry.path(), tmp_path.join(decoded.as_ref()))
-                .expect("could not copy test data");
-        }
-    }
-    func(Maildir::from(tmp_path.join(name)));
+    with_testdata("testdata", "", |tmp_path| {
+        func(Maildir::from(tmp_path.join(name)))
+    })
+    .expect("test data creation failed");
 }
 
 fn with_maildir_empty<F>(name: &str, func: F)
 where
     F: FnOnce(Maildir),
 {
-    let tmp_dir = tempdir().expect("could not create temporary directory");
+    let tmp_dir = tempfile::tempdir().expect("could not create temporary directory");
     let tmp_path = tmp_dir.path();
     func(Maildir::from(tmp_path.join(name)));
 }

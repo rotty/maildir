@@ -21,6 +21,8 @@ mailparse = "0.7"
 nix  = "0.14"
 
 [dev-dependencies]
+maildir-testdata = { version = "0.1.0", path = "maildir-testdata" }
 tempfile = "3.0.8"
-walkdir = "2.2.7"
-percent-encoding = "1.0.1"
+
+[workspace]
+members = ["maildir-testdata"]

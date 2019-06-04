@@ -1,0 +1,16 @@
+[package]
+name = "maildir-testdata"
+version = "0.1.0"
+authors = ["Andreas Rottmann <mail@r0tty.org>"]
+description = "Construct Maildir test data from encoded filenames"
+repository = "https://github.com/staktrace/maildir"
+readme = "README.md"
+keywords = ["maildir", "encoding", "filename"]
+categories = ["email", "filesystem"]
+license = "0BSD"
+edition = "2018"
+
+[dependencies]
+tempfile = "3.0.8"
+walkdir = "2.2.7"
+percent-encoding = "1.0.1"
